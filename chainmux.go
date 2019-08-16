@@ -117,7 +117,7 @@ func rewriteTo(asked string) string {
 
 func handleTunneling(w http.ResponseWriter, r *http.Request) {
 
-	dst := rewriteTo("conn://" + r.RequestURI)
+	dst := rewriteTo(r.RequestURI)
 
 	log.Println("CONN: requested ", r.RequestURI, ", redirected to:", dst)
 
@@ -160,7 +160,7 @@ func handleHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if strings.EqualFold(r.RequestURI, "/chainmux/reconf") &&
+	if strings.EqualFold(r.RequestURI, "/netmux/reconf") &&
 		strings.HasPrefix(r.RemoteAddr, "127.0.0.1:") {
 		log.Println("reloading rewrite conf file")
 		loadRules()
@@ -210,10 +210,10 @@ func main() {
 
 	flag.Usage = func() {
 		fmt.Println("")
-		fmt.Println("PDX chainmux, a lighweight whitelist-protected TCP & HTTP proxy service, ver. 1.0")
+		fmt.Println("PDX netmux, a lighweight whitelist-protected TCP & HTTP proxy service, ver. 1.0")
 		fmt.Println("")
-		fmt.Println("-conf	The configuration file. Or set via the PDX_CHAINMUX_CONF_FILE environment variable.")
-		fmt.Println("	Call http://localhost:{port}/chainmux/reconf to reload it on configuration change.")
+		fmt.Println("-conf	The configuration file. Or set via the PDX_NETMUX_CONF_FILE environment variable.")
+		fmt.Println("	Call http://localhost:{port}/netmux/reconf to reload it on configuration change.")
 		fmt.Println("")
 		fmt.Println("	Configuration file syntax:")
 		fmt.Println("		1) One line for each access granted (as-is or rewrite), honoring the first match")
@@ -228,7 +228,7 @@ func main() {
 		fmt.Println("		http://view.pdx.ltd:80 http://localhost:8080")
 		fmt.Println("		http://chain.pdx.link*")
 		fmt.Println("")
-		fmt.Println("-addr	The [host]:port chainmux listens on")
+		fmt.Println("-addr	The [host]:port chainmux listens on, default is :5978")
 		fmt.Println("")
                 fmt.Println("Please visit https://github.com/PDXbaap/chainmux to get the latest version.")
 		fmt.Println("")
@@ -242,7 +242,7 @@ func main() {
 	flag.Parse()
 
 	if fconf == "" {
-		fconf = os.Getenv("PDX_CHAINMUX_CONF_FILE")
+		fconf = os.Getenv("PDX_NETMUX_CONF_FILE")
 	}
 
 	if fconf == "" {
@@ -265,11 +265,11 @@ func main() {
 			}
 		}),}
 
-	log.Println("started PDX chainmux")
+	log.Println("started PDX netmux")
 
 	log.Fatal(server.ListenAndServe())
 
-	log.Println("shutdown PDX chainmux")
+	log.Println("shutdown PDX netmux")
 
 	os.Exit(0)
 }
